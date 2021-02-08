@@ -1,0 +1,26 @@
+{application, vernemq_auth_plugin,
+ [
+  {description, "A simple auth Plugin for VerneMQ"},
+  {vsn, "0.0.1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+				  jose,
+				  jsx
+                 ]},
+  {mod, { vernemq_auth_plugin_app, []}},
+  {env, [
+         %% this tells VerneMQ to look in the file 'vernemq_auth_plugin'
+         %% for the plugin hook functions. The format is:
+         %%  {ModuleName, HookName, Arity, Opts}
+         {vmq_plugin_hooks, 
+          [
+           {vernemq_auth_plugin, auth_on_register, 5, []},
+           {vernemq_auth_plugin, auth_on_publish, 6, []},
+           {vernemq_auth_plugin, auth_on_subscribe, 3, []},
+	       {vernemq_auth_plugin, on_client_gone, 1, []},
+		   {vernemq_auth_plugin, on_client_offline, 1, []}
+          ]}
+        ]}
+ ]}.
