@@ -140,7 +140,7 @@ check_token_expiry(ClientId, Token) ->
 
 authorize_publish_topic(Topic, IsRetain, Token) ->
 	ClaimsRetain = maps:get(<<"retain">>, Token, false),	
-	case maps:find(<<"topic-claims">>, Token) of 
+	case maps:find(<<"authz">>, Token) of 
 		{ok, Claims} ->
 			check_publish_claims(Topic, IsRetain, Claims, ClaimsRetain);
 		_ ->
