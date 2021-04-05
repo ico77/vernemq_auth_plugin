@@ -10,9 +10,9 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-	vernemq_auth_plugin_config:load(),
-	vernemq_auth_plugin_store:new(),    
-	vernemq_auth_plugin_sup:start_link().
+    vernemq_auth_plugin_config:load(),
+    vernemq_auth_plugin_store:new(),
+    vernemq_auth_plugin_sup:start_link().
 
 stop(_State) ->
     ok.
