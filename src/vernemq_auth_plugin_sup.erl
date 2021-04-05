@@ -22,4 +22,8 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    {ok, {{one_for_one, 5, 10}, []}}.
+    {ok, { {one_for_one, 5, 10}, [
+    		?CHILD(vernemq_auth_plugin_store, worker)]
+    	 }
+    }.
+
