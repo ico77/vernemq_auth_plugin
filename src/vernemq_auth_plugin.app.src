@@ -1,7 +1,7 @@
 {application,
  vernemq_auth_plugin,
  [{description, "A simple auth Plugin for VerneMQ"},
-  {vsn, "0.0.1"},
+  {vsn, "0.1.0"},
   {registered, []},
   {applications, [kernel, stdlib, jose, jsx]},
   {mod, {vernemq_auth_plugin_app, []}},
