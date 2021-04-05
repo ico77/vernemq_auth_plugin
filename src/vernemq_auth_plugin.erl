@@ -128,8 +128,8 @@ authorize_subscribe(ClientId, Topics, Token) ->
 	end.
 
 check_token_expiry(ClientId, Token) ->
-	ExpiryTimeStamp = maps:find(<<"exp">>, Token),
-	{_, TimeStamp, _} = os:timestamp(),
+	ExpiryTimeStamp = maps:get(<<"exp">>, Token),
+	TimeStamp = erlang:system_time(seconds),
 	case ExpiryTimeStamp < TimeStamp of
 		true ->
 			vernemq_auth_plugin_store:delete(ClientId),
