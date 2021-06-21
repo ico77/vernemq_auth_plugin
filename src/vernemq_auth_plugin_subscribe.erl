@@ -1,31 +1,20 @@
 -module(vernemq_auth_plugin_subscribe).
 
--export([authorize/3]).
+-export([authorize_topics/2]).
 
-authorize(ClientId, Topics, Token) ->
-    authorize_topics(Topics, Token).
-
-authorize_topics([], Token) ->
+authorize_topics([], _ClaimsTopics) ->
     ok;
-authorize_topics([Topic | Rest], Token) ->
-    case authorize_single_topic(Topic, Token) of
+authorize_topics([Topic | Rest], ClaimsTopics) ->
+    case check_subscribe_claims(Topic, ClaimsTopics) of
         ok ->
-            authorize_topics(Rest, Token);
+            authorize_topics(Rest, ClaimsTopics);
         {error, Reason} ->
             {error, Reason}
     end.
 
-authorize_single_topic({_Topic, _QoS} = Topic, Token) ->
-    case maps:find(<<"topic-claims">>, Token) of
-        {ok, Claims} ->
-            check_subscribe_claims(_Topic, Claims);
-        _ ->
-            {error, claims_missing}
-    end.
-
 check_subscribe_claims(_, []) ->
     {error, subscribe_not_allowed};
-check_subscribe_claims(Topic, [Claim | Rest]) ->
+check_subscribe_claims({Topic, _QoS}, [Claim | Rest]) ->
     case check_subscribe_claim(Topic, Claim) of
         true ->
             ok;
@@ -33,20 +22,9 @@ check_subscribe_claims(Topic, [Claim | Rest]) ->
             check_subscribe_claims(Topic, Rest)
     end.
 
-check_subscribe_claim(Topic, Claim) ->
-    IsActionAllowed =
-        case maps:find(<<"action">>, Claim) of
-            {ok, <<"subscribe">>} ->
-                true;
-            _ ->
-                false
-        end,
-    IsTopicAllowed =
-        case maps:find(<<"topic">>, Claim) of
-            {ok, ClaimTopic} ->
-                SplittedTopic = vernemq_auth_plugin_topic:word(ClaimTopic),
-                vernemq_auth_plugin_topic:match(Topic, SplittedTopic);
-            _ ->
-                false
-        end,
+check_subscribe_claim(Topic, {ClaimAction, ClaimTopic}) ->
+    IsActionAllowed = ClaimAction =:= subscribe,
+    SplittedTopic = vernemq_auth_plugin_topic:word(ClaimTopic),
+    IsTopicAllowed = vernemq_auth_plugin_topic:match(Topic, SplittedTopic),
+
     IsActionAllowed andalso IsTopicAllowed.
